@@ -1,10 +1,9 @@
 body{
 
-background:#0b0b0b;
-color:white;
-font-family:'Comfortaa',sans-serif;
 margin:0;
-overflow-x:hidden;
+font-family:'Comfortaa',sans-serif;
+background:#0a0a0a;
+color:white;
 
 }
 
@@ -12,43 +11,77 @@ overflow-x:hidden;
 
 position:fixed;
 top:0;
-left:0;
 width:100%;
 height:200px;
 
 background:radial-gradient(circle at top,
-rgba(180,180,180,.25),
-transparent 70%);
+rgba(200,200,200,.3),
+transparent);
 
 pointer-events:none;
+
+}
+
+#bg3d{
+
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+
+}
+
+header{
+
+text-align:center;
+padding:120px 20px;
+
+}
+
+#search{
+
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:20px;
+
+}
+
+.categories{
+
+margin-top:15px;
+
+}
+
+.categories button{
+
+margin:5px;
+padding:8px 14px;
+
+border:none;
+border-radius:10px;
+
+cursor:pointer;
 
 }
 
 .flags{
 
 position:fixed;
-right:25px;
+right:20px;
 top:20px;
 
 display:flex;
-gap:16px;
+gap:10px;
 
 }
 
 .flags img{
 
-width:42px;
+width:40px;
 cursor:pointer;
-
-border-radius:10px;
-
-transition:.3s;
-
-}
-
-.flags img:hover{
-
-transform:scale(1.2);
 
 }
 
@@ -58,25 +91,16 @@ position:fixed;
 left:20px;
 top:20px;
 
-padding:12px 20px;
+padding:12px 18px;
+
+border:none;
+border-radius:12px;
 
 background:rgba(255,255,255,.1);
-border:none;
-
-border-radius:14px;
 
 color:white;
 
 cursor:pointer;
-
-backdrop-filter:blur(12px);
-
-}
-
-header{
-
-text-align:center;
-padding:120px 20px 50px;
 
 }
 
@@ -90,54 +114,40 @@ justify-content:center;
 
 gap:40px;
 
-padding:30px;
+padding:40px;
 
 }
 
 .book{
 
-width:320px;
-
-background:rgba(255,255,255,.06);
-
-border-radius:20px;
+background:rgba(255,255,255,.08);
 
 padding:18px;
 
-backdrop-filter:blur(18px);
+border-radius:18px;
+
+backdrop-filter:blur(12px);
 
 }
 
 .book img{
 
 width:100%;
-
-border-radius:14px;
+border-radius:10px;
 
 }
 
 .readBtn{
 
 width:100%;
-
 margin-top:10px;
 
 padding:10px;
 
 border:none;
-
-border-radius:12px;
+border-radius:10px;
 
 cursor:pointer;
-
-}
-
-canvas{
-
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
 
 }
 
@@ -166,22 +176,15 @@ background:#1a1a1a;
 
 padding:30px;
 
-border-radius:18px;
+border-radius:16px;
 
-display:flex;
-
-flex-direction:column;
-
-gap:10px;
+max-width:700px;
+width:90%;
 
 }
 
-input{
+#viewer{
 
-padding:8px;
-
-border-radius:8px;
-
-border:none;
+height:500px;
 
 }
