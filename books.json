@@ -1,0 +1,19 @@
+[
+  {
+    "title":{
+      "ru":"Пример книги",
+      "en":"Example Book",
+      "ua":"Приклад книги"
+    },
+    "pages":120,
+    "languages":["RU","EN","UA"],
+    "illustrations":true,
+    "image":"images/example.jpg",
+
+    "files":{
+      "RU":"books/example_ru.pdf",
+      "EN":"books/example_en.pdf",
+      "UA":"books/example_ua.pdf"
+    }
+  }
+]
