@@ -1,186 +1,149 @@
-body{
-
-margin:0;
-font-family:'Comfortaa',sans-serif;
-background:#0b0b0b;
-color:white;
-overflow-x:hidden;
-
+body {
+    margin: 0;
+    font-family: 'Comfortaa', sans-serif;
+    background: #0b0b0b;
+    color: white;
+    overflow-x: hidden;
 }
 
-.topGlow{
-
-position:fixed;
-top:0;
-width:100%;
-height:200px;
-
-background:radial-gradient(circle at top,
-rgba(180,180,180,.25),
-transparent 70%);
-
-pointer-events:none;
-
+/* серое свечение сверху */
+.topGlow {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 200px;
+    background: radial-gradient(circle at top, rgba(180,180,180,0.25), transparent 70%);
+    pointer-events: none;
 }
 
-header{
-
-text-align:center;
-padding:120px 20px;
-
-animation:fadeUp 1s ease;
-
+header {
+    text-align: center;
+    padding: 120px 20px;
+    animation: fadeUp 1s ease;
 }
 
-@keyframes fadeUp{
-
-from{
-opacity:0;
-transform:translateY(-40px);
-filter:blur(10px);
+@keyframes fadeUp {
+    from {opacity:0; transform:translateY(-40px); filter:blur(10px);}
+    to {opacity:1; transform:translateY(0); filter:blur(0);}
 }
 
-to{
-opacity:1;
-transform:translateY(0);
-filter:blur(0);
+/* стеклянные кнопки */
+.glassBtn {
+    padding: 12px 18px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    color: white;
+    cursor: pointer;
+    transition: .3s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    margin: 5px;
 }
 
+.glassBtn:hover {
+    transform: translateY(-4px) scale(1.05);
+    background: rgba(255,255,255,0.18);
 }
 
-.flags{
-
-position:fixed;
-right:20px;
-top:20px;
-
-display:flex;
-gap:12px;
-
+/* кнопка админа */
+#adminBtn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
 }
 
-.flags img{
-
-width:44px;
-cursor:pointer;
-transition:.3s;
-
+/* языки */
+.flags {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    gap: 12px;
 }
 
-.flags img:hover{
-
-transform:scale(1.2);
-
+.flags img {
+    width: 44px;
+    cursor: pointer;
+    transition: .3s;
 }
 
-.glass{
-
-padding:12px 18px;
-border-radius:14px;
-border:none;
-
-background:rgba(255,255,255,.08);
-
-backdrop-filter:blur(10px);
-
-color:white;
-
-cursor:pointer;
-
-transition:.3s;
-
+.flags img:hover {
+    transform: scale(1.2);
 }
 
-.glass:hover{
-
-transform:translateY(-4px) scale(1.05);
-
-background:rgba(255,255,255,.18);
-
+/* поиск */
+#search {
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: none;
+    width: 260px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    color: white;
+    font-size: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    transition: .3s;
+    margin-top: 20px;
 }
 
-#adminBtn{
-
-position:fixed;
-left:20px;
-top:20px;
-
+#search:focus {
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-#books{
-
-display:grid;
-
-grid-template-columns:repeat(auto-fit,320px);
-
-justify-content:center;
-
-gap:40px;
-
-padding:40px;
-
+/* категории */
+.categories {
+    margin-top: 20px;
 }
 
-.book{
-
-background:rgba(255,255,255,.05);
-
-border-radius:18px;
-
-padding:20px;
-
-transition:.4s;
-
+/* карточки книг */
+#books {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 320px);
+    justify-content: center;
+    gap: 40px;
+    padding: 40px;
 }
 
-.book:hover{
-
-transform:translateY(-10px);
-
+.book {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 20px;
+    transition: .4s;
 }
 
-.book img{
+.book:hover { transform: translateY(-10px); }
 
-width:100%;
-border-radius:10px;
-
+.book img {
+    width: 100%;
+    border-radius: 10px;
 }
 
-.modal{
-
-position:fixed;
-top:0;
-left:0;
-
-width:100%;
-height:100%;
-
-display:none;
-
-align-items:center;
-justify-content:center;
-
-background:rgba(0,0,0,.85);
-
+/* модальные окна */
+.modal {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background: rgba(0,0,0,0.85);
 }
 
-.modalBox{
-
-background:#1a1a1a;
-
-padding:30px;
-
-border-radius:16px;
-
-width:90%;
-max-width:700px;
-
+.modalBox {
+    background:#1a1a1a;
+    padding:30px;
+    border-radius:16px;
+    width:90%;
+    max-width:700px;
 }
 
-iframe{
-
-width:100%;
-height:500px;
-border:none;
-
+iframe {
+    width: 100%;
+    height: 500px;
+    border: none;
 }
