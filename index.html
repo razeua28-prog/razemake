@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<title>RazeMake</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:"Comfortaa",sans-serif;
+background:linear-gradient(#f4f4f4,#e8e8e8);
+overflow-x:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+header{
+text-align:center;
+padding:70px 20px;
+animation:fadeUp 1s;
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(-40px); filter:blur(10px)}
+to{opacity:1; transform:translateY(0); filter:blur(0)}
+}
+
+h1{
+font-size:36px;
+}
+
+.lang{
+position:absolute;
+right:20px;
+top:20px;
+display:flex;
+gap:10px;
+}
+
+.flag{
+cursor:pointer;
+font-size:22px;
+transition:.3s;
+}
+
+.flag:hover{
+transform:scale(1.3);
+}
+
+.controls{
+display:flex;
+justify-content:center;
+gap:20px;
+margin-bottom:30px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:12px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:"Comfortaa";
+}
+
+.library{
+display:flex;
+flex-wrap:wrap;
+gap:30px;
+justify-content:center;
+padding:40px;
+}
+
+.card{
+
+width:260px;
+
+background:rgba(255,255,255,0.55);
+backdrop-filter:blur(14px);
+
+border-radius:20px;
+
+padding:20px;
+
+box-shadow:0 20px 40px rgba(0,0,0,0.1);
+
+animation:fadeUp 0.8s;
+
+}
+
+.card img{
+width:100%;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+input{
+width:100%;
+margin:4px 0;
+padding:6px;
+border-radius:8px;
+border:1px solid #ccc;
+font-family:"Comfortaa";
+}
+
+.readBtn{
+margin-top:10px;
+width:100%;
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:none;
+background:rgba(0,0,0,.6);
+justify-content:center;
+align-items:center;
+}
+
+.modalBox{
+background:white;
+padding:30px;
+border-radius:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="lang">
+
+<div class="flag" onclick="setLang('ru')">🇷🇺</div>
+<div class="flag" onclick="setLang('en')">🇬🇧</div>
+<div class="flag" onclick="setLang('ua')">🇺🇦</div>
+
+</div>
+
+<header>
+
+<h1 id="welcome">
+Добро пожаловать в онлайн-библиотеку издательства RazeMake!
+</h1>
+
+</header>
+
+<div class="controls">
+
+<button onclick="toggleEdit()">Редактировать</button>
+<button onclick="addBook()">Добавить книгу</button>
+
+</div>
+
+<div class="library" id="library"></div>
+
+<div class="modal" id="reader">
+
+<div class="modalBox">
+
+<div id="files"></div>
+<br>
+<button onclick="closeReader()">Закрыть</button>
+
+</div>
+
+</div>
+
+<script>
+
+let edit=false
+
+let books=JSON.parse(localStorage.getItem("books")||"[]")
+
+function save(){
+
+localStorage.setItem("books",JSON.stringify(books))
+
+}
+
+function toggleEdit(){
+
+edit=!edit
+render()
+
+}
+
+function addBook(){
+
+books.push({
+
+title:"Новая книга",
+pages:"0",
+languages:"RU",
+illustrations:"Нет",
+image:"",
+files:[""]
+
+})
+
+save()
+render()
+
+}
+
+function openReader(files){
+
+let html=""
+
+files.forEach(f=>{
+
+if(f) html+=`<p><a href="${f}" target="_blank">Открыть файл</a></p>`
+
+})
+
+document.getElementById("files").innerHTML=html
+document.getElementById("reader").style.display="flex"
+
+}
+
+function closeReader(){
+
+reader.style.display="none"
+
+}
+
+function render(){
+
+let lib=document.getElementById("library")
+
+lib.innerHTML=""
+
+books.forEach((b,i)=>{
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=edit?`
+
+<input value="${b.title}" onchange="books[${i}].title=this.value;save()">
+
+<input value="${b.pages}" onchange="books[${i}].pages=this.value;save()">
+
+<input value="${b.languages}" onchange="books[${i}].languages=this.value;save()">
+
+<input value="${b.illustrations}" onchange="books[${i}].illustrations=this.value;save()">
+
+<input placeholder="URL картинки" value="${b.image}" onchange="books[${i}].image=this.value;save()">
+
+<input placeholder="Файл 1" value="${b.files[0]||''}" onchange="books[${i}].files[0]=this.value;save()">
+
+<input placeholder="Файл 2" value="${b.files[1]||''}" onchange="books[${i}].files[1]=this.value;save()">
+
+<input placeholder="Файл 3" value="${b.files[2]||''}" onchange="books[${i}].files[2]=this.value;save()">
+
+`:
+
+`
+
+<img src="${b.image||'https://picsum.photos/300/400'}">
+
+<h3>${b.title}</h3>
+
+<p>Кол-во страниц: ${b.pages}</p>
+<p>Доступные языки: ${b.languages}</p>
+<p>Иллюстрации: ${b.illustrations}</p>
+
+<button class="readBtn" onclick='openReader(${JSON.stringify(b.files)})'>
+Читать
+</button>
+
+`
+
+lib.appendChild(card)
+
+})
+
+}
+
+render()
+
+// particles
+
+const canvas=document.getElementById("bg")
+const ctx=canvas.getContext("2d")
+
+canvas.width=innerWidth
+canvas.height=innerHeight
+
+let shapes=[]
+
+for(let i=0;i<50;i++){
+
+shapes.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:5+Math.random()*10,
+vx:-1+Math.random()*2,
+vy:-1+Math.random()*2,
+type:Math.floor(Math.random()*3)
+
+})
+
+}
+
+let mouse={x:0,y:0}
+
+document.addEventListener("mousemove",e=>{
+
+mouse.x=e.clientX
+mouse.y=e.clientY
+
+})
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+shapes.forEach(s=>{
+
+let dx=s.x-mouse.x
+let dy=s.y-mouse.y
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<120){
+
+s.vx+=dx/dist
+s.vy+=dy/dist
+
+}
+
+s.x+=s.vx*0.03
+s.y+=s.vy*0.03
+
+ctx.fillStyle="rgba(0,0,0,0.08)"
+
+ctx.beginPath()
+
+if(s.type==0) ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
+
+if(s.type==1) ctx.rect(s.x,s.y,s.size,s.size)
+
+if(s.type==2){
+
+ctx.moveTo(s.x,s.y)
+ctx.lineTo(s.x+s.size,s.y)
+ctx.lineTo(s.x+s.size/2,s.y+s.size)
+
+}
+
+ctx.fill()
+
+})
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
+
+// languages
+
+const texts={
+
+ru:"Добро пожаловать в онлайн-библиотеку издательства RazeMake!",
+en:"Welcome to the RazeMake publishing online library!",
+ua:"Ласкаво просимо до онлайн-бібліотеки видавництва RazeMake!"
+
+}
+
+function setLang(l){
+
+document.getElementById("welcome").innerText=texts[l]
+
+}
+
+</script>
+
+</body>
+</html>
