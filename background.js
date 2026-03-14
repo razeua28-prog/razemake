@@ -17,7 +17,7 @@ camera.position.z=10
 
 const shapes=[]
 
-function createShape(type){
+function create(type){
 
 let geo
 
@@ -26,30 +26,30 @@ else geo=new THREE.ConeGeometry(1,2,4)
 
 const mat=new THREE.MeshBasicMaterial({
 color:0xffffff,
-wireframe:true
+wireframe:true,
+opacity:0.25,
+transparent:true
 })
 
 const mesh=new THREE.Mesh(geo,mat)
 
-mesh.position.x=(Math.random()-0.5)*15
-mesh.position.y=(Math.random()-0.5)*10
-mesh.position.z=(Math.random()-0.5)*5
+mesh.position.x=(Math.random()-0.5)*12
+mesh.position.y=(Math.random()-0.5)*8
 
-mesh.velocity={
+mesh.vel={
 x:(Math.random()-0.5)*0.01,
 y:(Math.random()-0.5)*0.01
 }
 
 scene.add(mesh)
-
 shapes.push(mesh)
 
 }
 
-for(let i=0;i<25;i++){
+for(let i=0;i<20;i++){
 
-createShape("cube")
-createShape("pyramid")
+create("cube")
+create("pyramid")
 
 }
 
@@ -68,17 +68,17 @@ requestAnimationFrame(animate)
 
 shapes.forEach(s=>{
 
-s.rotation.x+=0.004
-s.rotation.y+=0.004
+s.rotation.x+=0.002
+s.rotation.y+=0.002
 
-s.position.x+=s.velocity.x
-s.position.y+=s.velocity.y
+s.position.x+=s.vel.x
+s.position.y+=s.vel.y
 
-s.position.x+=mouse.x*0.002
-s.position.y-=mouse.y*0.002
+s.position.x+=mouse.x*0.01
+s.position.y-=mouse.y*0.01
 
-if(s.position.x>8||s.position.x<-8) s.velocity.x*=-1
-if(s.position.y>5||s.position.y<-5) s.velocity.y*=-1
+if(s.position.x>6||s.position.x<-6) s.vel.x*=-1
+if(s.position.y>4||s.position.y<-4) s.vel.y*=-1
 
 })
 
