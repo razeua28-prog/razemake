@@ -1,6 +1,12 @@
 let lang="en"
 
-const translations={
+const names={
+ru:"Русский",
+en:"English",
+ua:"Українська"
+}
+
+const t={
 
 en:{
 welcome:"Welcome to the online library of RazeMake publishing",
@@ -19,43 +25,39 @@ read:"Читати"
 
 }
 
-let books=JSON.parse(localStorage.getItem("books"))||[]
+let books=JSON.parse(localStorage.getItem("books"))
 
-if(books.length===0){
+if(!books){
 
-fetch("data/books.json")
+fetch("books.json")
 .then(r=>r.json())
 .then(d=>{
 books=d
-saveBooks()
-renderBooks()
+save()
+render()
 })
 
-}else{
+}else render()
 
-renderBooks()
-
-}
-
-function saveBooks(){
+function save(){
 
 localStorage.setItem("books",JSON.stringify(books))
 
 }
 
-function renderBooks(){
+function render(){
 
-document.getElementById("welcome").innerText=translations[lang].welcome
+welcome.innerText=t[lang].welcome
 
-const container=document.getElementById("books")
-container.innerHTML=""
+const box=document.getElementById("books")
+box.innerHTML=""
 
 books.forEach((b,i)=>{
 
-const card=document.createElement("div")
-card.className="book"
+const el=document.createElement("div")
+el.className="book"
 
-card.innerHTML=`
+el.innerHTML=`
 
 <img src="${b.image}">
 
@@ -63,72 +65,26 @@ card.innerHTML=`
 
 <p>Pages: ${b.pages}</p>
 
-<button class="glassBtn readBtn">
-${translations[lang].read}
-</button>
+<button class="glass">${t[lang].read}</button>
 
 `
 
-card.querySelector("button").onclick=()=>openBook(i)
+el.querySelector("button").onclick=()=>openBook(i)
 
-container.appendChild(card)
+box.appendChild(el)
 
 })
 
 }
 
-/* search */
-
-document.getElementById("search").oninput=e=>{
-
-const q=e.target.value.toLowerCase()
-
-const filtered=books.filter(b=>
-b.title.toLowerCase().includes(q)
-)
-
-renderFiltered(filtered)
-
-}
-
-function renderFiltered(list){
-
-const container=document.getElementById("books")
-container.innerHTML=""
-
-list.forEach((b,i)=>{
-
-const card=document.createElement("div")
-card.className="book"
-
-card.innerHTML=`
-
-<img src="${b.image}">
-<h3>${b.title}</h3>
-<p>Pages: ${b.pages}</p>
-
-<button class="glassBtn readBtn">
-${translations[lang].read}
-</button>
-
-`
-
-card.querySelector("button").onclick=()=>openBook(i)
-
-container.appendChild(card)
-
-})
-
-}
-
-/* language */
+/* languages */
 
 document.querySelectorAll(".flags img").forEach(f=>{
 
 f.onclick=()=>{
 
 lang=f.dataset.lang
-renderBooks()
+render()
 
 }
 
@@ -149,13 +105,13 @@ if(book.links[l]){
 
 const btn=document.createElement("button")
 
-btn.className="glassBtn"
+btn.className="glass"
 
-btn.innerText=l.toUpperCase()
+btn.innerText=names[l]
 
 btn.onclick=()=>{
 
-document.getElementById("viewer").src=book.links[l]
+viewer.src=book.links[l]
 
 }
 
@@ -165,25 +121,48 @@ list.appendChild(btn)
 
 }
 
-document.getElementById("reader").style.display="flex"
+reader.style.display="flex"
 
 }
 
 function closeReader(){
 
-document.getElementById("reader").style.display="none"
+reader.style.display="none"
+
+}
+
+/* categories */
+
+function filterCategory(cat){
+
+if(cat==="all") render()
+
+else{
+
+const filtered=books.filter(b=>b.category===cat)
+
+renderFiltered(filtered)
+
+}
+
+}
+
+function renderFiltered(list){
+
+books=list
+render()
 
 }
 
 /* admin */
 
-document.getElementById("adminBtn").onclick=()=>{
+adminBtn.onclick=()=>{
 
-const pass=prompt("Password")
+const p=prompt("Password")
 
-if(pass==="iloverazemake"){
+if(p==="iloverazemake"){
 
-document.getElementById("adminPanel").style.display="flex"
+adminPanel.style.display="flex"
 renderAdmin()
 
 }
@@ -192,7 +171,7 @@ renderAdmin()
 
 function closeAdmin(){
 
-document.getElementById("adminPanel").style.display="none"
+adminPanel.style.display="none"
 
 }
 
@@ -200,30 +179,30 @@ function addBook(){
 
 const book={
 
-title:bookTitle.value,
-pages:bookPages.value,
-image:bookImage.value,
+title:title.value,
+pages:pages.value,
+category:category.value,
+image:image.value,
 
 links:{
-ru:ruLink.value,
-en:enLink.value,
-ua:uaLink.value
+ru:ru.value,
+en:en.value,
+ua:ua.value
 }
 
 }
 
 books.push(book)
 
-saveBooks()
-renderBooks()
+save()
+render()
 renderAdmin()
 
 }
 
 function renderAdmin(){
 
-const list=document.getElementById("adminBooks")
-list.innerHTML=""
+adminList.innerHTML=""
 
 books.forEach((b,i)=>{
 
@@ -233,13 +212,13 @@ row.innerHTML=`
 
 ${b.title}
 
-<button class="glassBtn" onclick="deleteBook(${i})">
+<button onclick="deleteBook(${i})" class="glass">
 Delete
 </button>
 
 `
 
-list.appendChild(row)
+adminList.appendChild(row)
 
 })
 
@@ -249,8 +228,8 @@ function deleteBook(i){
 
 books.splice(i,1)
 
-saveBooks()
-renderBooks()
+save()
+render()
 renderAdmin()
 
 }
