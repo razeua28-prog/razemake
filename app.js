@@ -1,214 +1,253 @@
-document.addEventListener("DOMContentLoaded",()=>{
+let lang="en"
 
-let lang="ru"
-let books=[]
+let books=JSON.parse(localStorage.getItem("books"))||[]
 
 const text={
 
-ru:{
-welcome:"Добро пожаловать в онлайн-библиотеку издательства RazeMake!",
-pages:"Страниц",
-languages:"Языки",
-illustrations:"Иллюстрации",
-read:"Читать",
-admin:"Войти как администратор"
+en:{
+welcome:"Welcome to the online library of RazeMake publishing",
+read:"Read",
+pages:"Pages",
+languages:{
+ru:"Русский",
+en:"English",
+ua:"Українська"
+}
 },
 
-en:{
-welcome:"Welcome to the online library of RazeMake publishing!",
-pages:"Pages",
-languages:"Languages",
-illustrations:"Illustrations",
-read:"Read",
-admin:"Admin login"
+ru:{
+welcome:"Добро пожаловать в онлайн-библиотеку издательства RazeMake",
+read:"Читать",
+pages:"Страниц",
+languages:{
+ru:"Русский",
+en:"English",
+ua:"Українська"
+}
 },
 
 ua:{
-welcome:"Ласкаво просимо до онлайн бібліотеки видавництва RazeMake!",
-pages:"Сторінок",
-languages:"Мови",
-illustrations:"Ілюстрації",
+welcome:"Ласкаво просимо до онлайн бібліотеки видавництва RazeMake",
 read:"Читати",
-admin:"Увійти як адміністратор"
+pages:"Сторінок",
+languages:{
+ru:"Русский",
+en:"English",
+ua:"Українська"
+}
 }
 
 }
-
-/* load books */
-
-fetch("books.json")
-.then(r=>r.json())
-.then(data=>{
-
-books=data
-render()
-
-})
-
-/* render */
 
 function render(){
 
 document.getElementById("welcome").innerText=text[lang].welcome
-document.getElementById("adminBtn").innerText=text[lang].admin
 
 const container=document.getElementById("books")
+
 container.innerHTML=""
 
-books.forEach(book=>{
+books.forEach((b,i)=>{
 
-const card=document.createElement("div")
-card.className="book"
+const el=document.createElement("div")
+el.className="book"
 
-card.innerHTML=`
+el.innerHTML=`
 
-<img src="${book.image}">
+<img src="${b.image}">
 
-<h3>${book.title[lang]}</h3>
+<h3>${b.title}</h3>
 
-<p>${text[lang].pages}: ${book.pages}</p>
-
-<p>${text[lang].languages}: ${book.languages.join(", ")}</p>
-
-<p>${text[lang].illustrations}: ${book.illustrations?"✔":"✖"}</p>
+<p>${text[lang].pages}: ${b.pages}</p>
 
 <button class="readBtn">${text[lang].read}</button>
 
 `
 
-card.querySelector("button").onclick=()=>openBook(book)
+el.querySelector("button").onclick=()=>openReader(b)
 
-container.appendChild(card)
+container.appendChild(el)
 
 })
 
 }
 
-/* language switch */
+function openReader(book){
 
-document.querySelectorAll(".flags img").forEach(flag=>{
+const list=document.getElementById("fileList")
+list.innerHTML=""
 
-flag.onclick=()=>{
+for(let l in book.links){
 
-lang=flag.dataset.lang
+if(book.links[l]){
+
+const a=document.createElement("a")
+
+a.href=book.links[l]
+
+a.target="_blank"
+
+a.innerText=text[lang].languages[l]
+
+list.appendChild(a)
+
+}
+
+}
+
+document.getElementById("reader").style.display="flex"
+
+}
+
+function closeReader(){
+
+document.getElementById("reader").style.display="none"
+
+}
+
+document.querySelectorAll(".flags img").forEach(f=>{
+
+f.onclick=()=>{
+
+lang=f.dataset.lang
+
 render()
 
 }
 
 })
 
-/* modal */
-
-function openBook(book){
-
-const modal=document.getElementById("reader")
-const list=document.getElementById("fileList")
-
-list.innerHTML=""
-
-for(let l in book.files){
-
-const a=document.createElement("a")
-
-a.href=book.files[l]
-a.target="_blank"
-a.innerText=l
-
-list.appendChild(a)
-
-}
-
-modal.style.display="flex"
-
-}
-
-document.getElementById("closeModal").onclick=()=>{
-
-document.getElementById("reader").style.display="none"
-
-}
-
-/* admin */
-
 document.getElementById("adminBtn").onclick=()=>{
 
-const pass=prompt("Password")
+const p=prompt("Password")
 
-if(pass==="iloverazemake"){
+if(p==="iloverazemake"){
 
-alert("Admin mode activated")
+document.getElementById("adminPanel").style.display="flex"
+
+}
+
+}
+
+function closeAdmin(){
+
+document.getElementById("adminPanel").style.display="none"
+
+}
+
+function addBook(){
+
+const book={
+
+title:document.getElementById("bookTitle").value,
+
+pages:document.getElementById("bookPages").value,
+
+image:document.getElementById("bookImage").value,
+
+links:{
+
+ru:document.getElementById("ruLink").value,
+
+en:document.getElementById("enLink").value,
+
+ua:document.getElementById("uaLink").value
 
 }
 
 }
 
-/* interactive background */
+books.push(book)
+
+localStorage.setItem("books",JSON.stringify(books))
+
+render()
+
+}
+
+render()
+
+/* particles */
 
 const canvas=document.getElementById("bg")
 const ctx=canvas.getContext("2d")
 
-let w=canvas.width=window.innerWidth
-let h=canvas.height=window.innerHeight
+canvas.width=innerWidth
+canvas.height=innerHeight
 
 let mouse={x:0,y:0}
 
-window.addEventListener("mousemove",e=>{
+window.onmousemove=e=>{
+mouse.x=e.x
+mouse.y=e.y
+}
 
-mouse.x=e.clientX
-mouse.y=e.clientY
+let shapes=[]
 
-})
+for(let i=0;i<60;i++){
 
-let particles=[]
+shapes.push({
 
-for(let i=0;i<80;i++){
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
 
-particles.push({
+vx:(Math.random()-.5)*1,
+vy:(Math.random()-.5)*1,
 
-x:Math.random()*w,
-y:Math.random()*h,
+size:8+Math.random()*10,
 
-vx:(Math.random()-.5)*0.5,
-vy:(Math.random()-.5)*0.5,
-
-size:3+Math.random()*4
+type:Math.floor(Math.random()*3)
 
 })
 
 }
 
-function animate(){
+function draw(){
 
-ctx.clearRect(0,0,w,h)
+ctx.clearRect(0,0,canvas.width,canvas.height)
 
-particles.forEach(p=>{
+shapes.forEach(s=>{
 
-let dx=p.x-mouse.x
-let dy=p.y-mouse.y
+if(s.x<0||s.x>canvas.width)s.vx*=-1
+if(s.y<0||s.y>canvas.height)s.vy*=-1
 
-let dist=Math.sqrt(dx*dx+dy*dy)
+s.x+=s.vx
+s.y+=s.vy
 
-if(dist<120){
+let dx=s.x-mouse.x
+let dy=s.y-mouse.y
 
-p.vx+=dx*0.0005
-p.vy+=dy*0.0005
+let d=Math.sqrt(dx*dx+dy*dy)
+
+if(d<120){
+
+s.vx+=dx*0.002
+s.vy+=dy*0.002
 
 }
 
-p.x+=p.vx
-p.y+=p.vy
+ctx.fillStyle="rgba(255,255,255,.08)"
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,p.size,0,Math.PI*2)
-ctx.fillStyle="rgba(255,255,255,0.08)"
+
+if(s.type==0)ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
+
+if(s.type==1)ctx.rect(s.x,s.y,s.size,s.size)
+
+if(s.type==2){
+
+ctx.moveTo(s.x,s.y)
+ctx.lineTo(s.x+s.size,s.y)
+ctx.lineTo(s.x+s.size/2,s.y-s.size)
+
+}
+
 ctx.fill()
 
 })
 
-requestAnimationFrame(animate)
+requestAnimationFrame(draw)
 
 }
 
-animate()
-
-})
+draw()
