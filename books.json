@@ -4,10 +4,6 @@
 "pages":120,
 "category":"poetry",
 "image":"https://picsum.photos/400/600",
-"links":{
-"ru":"books/book_ru.pdf",
-"en":"books/book_en.pdf",
-"ua":"books/book_ua.pdf"
-}
+"links":{"ru":"books/book_ru.pdf","en":"books/book_en.pdf","ua":"books/book_ua.pdf"}
 }
 ]
