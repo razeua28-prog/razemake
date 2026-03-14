@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>RazeMake Library</title>
+<title>RazeMake</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -19,27 +20,23 @@
 
 <header>
 
+<button id="adminBtn"></button>
+
 <h1 id="welcome"></h1>
 
-<div class="lang-switch">
+<div class="lang">
 
-<span class="flag" data-lang="ru">🇷🇺</span>
-<span class="flag" data-lang="en">🇬🇧</span>
-<span class="flag" data-lang="ua">🇺🇦</span>
+<img src="https://flagcdn.com/w40/ru.png" data-lang="ru">
+<img src="https://flagcdn.com/w40/gb.png" data-lang="en">
+<img src="https://flagcdn.com/w40/ua.png" data-lang="ua">
 
 </div>
 
 </header>
 
-<section id="books" class="books"></section>
+<section id="books"></section>
 
-<div class="admin">
-
-<button id="adminBtn"></button>
-
-</div>
-
-<div id="readerModal" class="modal">
+<div id="modal" class="modal">
 
 <div class="modalContent">
 
@@ -47,7 +44,7 @@
 
 <div id="fileList"></div>
 
-<button onclick="closeModal()">Close</button>
+<button onclick="closeModal()">✕</button>
 
 </div>
 
