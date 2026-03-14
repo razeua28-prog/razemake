@@ -1,13 +1,14 @@
+document.addEventListener("DOMContentLoaded",()=>{
+
 let lang="ru"
 let books=[]
-let admin=false
 
 const text={
 
 ru:{
 welcome:"Добро пожаловать в онлайн-библиотеку издательства RazeMake!",
-pages:"Кол-во страниц",
-languages:"Доступные языки",
+pages:"Страниц",
+languages:"Языки",
 illustrations:"Иллюстрации",
 read:"Читать",
 admin:"Войти как администратор"
@@ -24,7 +25,7 @@ admin:"Admin login"
 
 ua:{
 welcome:"Ласкаво просимо до онлайн бібліотеки видавництва RazeMake!",
-pages:"Кількість сторінок",
+pages:"Сторінок",
 languages:"Мови",
 illustrations:"Ілюстрації",
 read:"Читати",
@@ -33,12 +34,18 @@ admin:"Увійти як адміністратор"
 
 }
 
+/* load books */
+
 fetch("books.json")
 .then(r=>r.json())
-.then(d=>{
-books=d
+.then(data=>{
+
+books=data
 render()
+
 })
+
+/* render */
 
 function render(){
 
@@ -46,15 +53,14 @@ document.getElementById("welcome").innerText=text[lang].welcome
 document.getElementById("adminBtn").innerText=text[lang].admin
 
 const container=document.getElementById("books")
-
 container.innerHTML=""
 
 books.forEach(book=>{
 
-const div=document.createElement("div")
-div.className="book"
+const card=document.createElement("div")
+card.className="book"
 
-div.innerHTML=`
+card.innerHTML=`
 
 <img src="${book.image}">
 
@@ -62,7 +68,7 @@ div.innerHTML=`
 
 <p>${text[lang].pages}: ${book.pages}</p>
 
-<p>${text[lang].languages}: ${book.languages.join(",")}</p>
+<p>${text[lang].languages}: ${book.languages.join(", ")}</p>
 
 <p>${text[lang].illustrations}: ${book.illustrations?"✔":"✖"}</p>
 
@@ -70,18 +76,32 @@ div.innerHTML=`
 
 `
 
-div.querySelector("button").onclick=()=>openBook(book)
+card.querySelector("button").onclick=()=>openBook(book)
 
-container.appendChild(div)
+container.appendChild(card)
 
 })
 
 }
 
+/* language switch */
+
+document.querySelectorAll(".flags img").forEach(flag=>{
+
+flag.onclick=()=>{
+
+lang=flag.dataset.lang
+render()
+
+}
+
+})
+
+/* modal */
+
 function openBook(book){
 
-document.getElementById("modal").style.display="flex"
-
+const modal=document.getElementById("reader")
 const list=document.getElementById("fileList")
 
 list.innerHTML=""
@@ -91,135 +111,104 @@ for(let l in book.files){
 const a=document.createElement("a")
 
 a.href=book.files[l]
-
-a.innerText=l
-
 a.target="_blank"
-
-a.style.display="block"
-
-a.style.margin="10px 0"
+a.innerText=l
 
 list.appendChild(a)
 
 }
 
-}
-
-function closeModal(){
-
-document.getElementById("modal").style.display="none"
+modal.style.display="flex"
 
 }
 
-document.querySelectorAll(".lang img").forEach(el=>{
+document.getElementById("closeModal").onclick=()=>{
 
-el.onclick=()=>{
-
-lang=el.dataset.lang
-
-render()
+document.getElementById("reader").style.display="none"
 
 }
 
-})
+/* admin */
 
 document.getElementById("adminBtn").onclick=()=>{
 
-const p=prompt("Password")
+const pass=prompt("Password")
 
-if(p==="iloverazemake"){
+if(pass==="iloverazemake"){
 
-admin=true
-
-alert("Admin mode enabled")
+alert("Admin mode activated")
 
 }
 
 }
+
+/* interactive background */
+
 const canvas=document.getElementById("bg")
 const ctx=canvas.getContext("2d")
 
-canvas.width=window.innerWidth
-canvas.height=window.innerHeight
+let w=canvas.width=window.innerWidth
+let h=canvas.height=window.innerHeight
 
 let mouse={x:0,y:0}
 
-document.addEventListener("mousemove",e=>{
+window.addEventListener("mousemove",e=>{
+
 mouse.x=e.clientX
 mouse.y=e.clientY
+
 })
 
-let shapes=[]
+let particles=[]
 
-for(let i=0;i<60;i++){
+for(let i=0;i<80;i++){
 
-shapes.push({
+particles.push({
 
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-size:6+Math.random()*10,
-type:Math.floor(Math.random()*3),
-dx:(Math.random()-.5)*1,
-dy:(Math.random()-.5)*1
+x:Math.random()*w,
+y:Math.random()*h,
+
+vx:(Math.random()-.5)*0.5,
+vy:(Math.random()-.5)*0.5,
+
+size:3+Math.random()*4
 
 })
 
 }
 
-function draw(){
+function animate(){
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+ctx.clearRect(0,0,w,h)
 
-shapes.forEach(s=>{
+particles.forEach(p=>{
 
-let dist=Math.hypot(mouse.x-s.x,mouse.y-s.y)
+let dx=p.x-mouse.x
+let dy=p.y-mouse.y
+
+let dist=Math.sqrt(dx*dx+dy*dy)
 
 if(dist<120){
 
-s.x+=(s.x-mouse.x)*0.02
-s.y+=(s.y-mouse.y)*0.02
-s.size+=0.2
-
-}else{
-
-s.size*=0.98
+p.vx+=dx*0.0005
+p.vy+=dy*0.0005
 
 }
 
-ctx.fillStyle="rgba(255,255,255,0.07)"
+p.x+=p.vx
+p.y+=p.vy
 
 ctx.beginPath()
-
-if(s.type===0){
-
-ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
-
-}
-
-if(s.type===1){
-
-ctx.rect(s.x,s.y,s.size,s.size)
-
-}
-
-if(s.type===2){
-
-ctx.moveTo(s.x,s.y)
-ctx.lineTo(s.x+s.size,s.y)
-ctx.lineTo(s.x+s.size/2,s.y-s.size)
-
-}
-
+ctx.arc(p.x,p.y,p.size,0,Math.PI*2)
+ctx.fillStyle="rgba(255,255,255,0.08)"
 ctx.fill()
-
-s.x+=s.dx
-s.y+=s.dy
 
 })
 
-requestAnimationFrame(draw)
+requestAnimationFrame(animate)
 
 }
 
-draw()
+animate()
+
+})
