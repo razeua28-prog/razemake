@@ -1,235 +1,119 @@
-let lang="en"
+let lang = "en";
+const names = {ru:"Русский", en:"English", ua:"Українська"};
 
-const names={
-ru:"Русский",
-en:"English",
-ua:"Українська"
+const translations = {
+    en:{welcome:"Welcome to the online library of RazeMake publishing", read:"Read"},
+    ru:{welcome:"Добро пожаловать в онлайн библиотеку издательства RazeMake", read:"Читать"},
+    ua:{welcome:"Ласкаво просимо до онлайн бібліотеки видавництва RazeMake", read:"Читати"}
 }
 
-const t={
+// загрузка книг
+let books = JSON.parse(localStorage.getItem("books")) || [];
+if(books.length === 0){
+    fetch("books.json").then(r=>r.json()).then(d=>{
+        books = d;
+        saveBooks();
+        renderBooks();
+    });
+} else renderBooks();
 
-en:{
-welcome:"Welcome to the online library of RazeMake publishing",
-read:"Read"
-},
+// сохранение
+function saveBooks(){ localStorage.setItem("books", JSON.stringify(books)); }
 
-ru:{
-welcome:"Добро пожаловать в онлайн библиотеку издательства RazeMake",
-read:"Читать"
-},
-
-ua:{
-welcome:"Ласкаво просимо до онлайн бібліотеки видавництва RazeMake",
-read:"Читати"
+// рендер книг
+function renderBooks(){
+    document.getElementById("welcome").innerText = translations[lang].welcome;
+    const container = document.getElementById("books");
+    container.innerHTML = "";
+    books.forEach((b,i)=>{
+        const card = document.createElement("div");
+        card.className="book";
+        card.innerHTML = `
+            <img src="${b.image}">
+            <h3>${b.title}</h3>
+            <p>Pages: ${b.pages}</p>
+            <button class="glassBtn">${translations[lang].read}</button>
+        `;
+        card.querySelector("button").onclick = ()=>openBook(i);
+        container.appendChild(card);
+    });
 }
 
+// поиск
+document.getElementById("search").oninput = e=>{
+    const q = e.target.value.toLowerCase();
+    renderFiltered(books.filter(b=>b.title.toLowerCase().includes(q)));
 }
+function renderFiltered(list){ books = list; renderBooks(); }
 
-let books=JSON.parse(localStorage.getItem("books"))
-
-if(!books){
-
-fetch("books.json")
-.then(r=>r.json())
-.then(d=>{
-books=d
-save()
-render()
-})
-
-}else render()
-
-function save(){
-
-localStorage.setItem("books",JSON.stringify(books))
-
-}
-
-function render(){
-
-welcome.innerText=t[lang].welcome
-
-const box=document.getElementById("books")
-box.innerHTML=""
-
-books.forEach((b,i)=>{
-
-const el=document.createElement("div")
-el.className="book"
-
-el.innerHTML=`
-
-<img src="${b.image}">
-
-<h3>${b.title}</h3>
-
-<p>Pages: ${b.pages}</p>
-
-<button class="glass">${t[lang].read}</button>
-
-`
-
-el.querySelector("button").onclick=()=>openBook(i)
-
-box.appendChild(el)
-
-})
-
-}
-
-/* languages */
-
+// языки
 document.querySelectorAll(".flags img").forEach(f=>{
+    f.onclick = ()=>{
+        lang = f.dataset.lang;
+        renderBooks();
+    }
+});
 
-f.onclick=()=>{
-
-lang=f.dataset.lang
-render()
-
-}
-
-})
-
-/* reader */
-
+// reader
 function openBook(i){
-
-const book=books[i]
-
-const list=document.getElementById("fileList")
-list.innerHTML=""
-
-for(let l in book.links){
-
-if(book.links[l]){
-
-const btn=document.createElement("button")
-
-btn.className="glass"
-
-btn.innerText=names[l]
-
-btn.onclick=()=>{
-
-viewer.src=book.links[l]
-
+    const book = books[i];
+    const list = document.getElementById("fileList");
+    list.innerHTML="";
+    for(let l in book.links){
+        if(book.links[l]){
+            const btn = document.createElement("button");
+            btn.className="glassBtn";
+            btn.innerText = names[l];
+            btn.onclick = ()=>document.getElementById("viewer").src = book.links[l];
+            list.appendChild(btn);
+        }
+    }
+    document.getElementById("reader").style.display="flex";
 }
+function closeReader(){ document.getElementById("reader").style.display="none"; }
 
-list.appendChild(btn)
-
-}
-
-}
-
-reader.style.display="flex"
-
-}
-
-function closeReader(){
-
-reader.style.display="none"
-
-}
-
-/* categories */
-
+// категории
 function filterCategory(cat){
-
-if(cat==="all") render()
-
-else{
-
-const filtered=books.filter(b=>b.category===cat)
-
-renderFiltered(filtered)
-
+    if(cat==="all") renderBooks();
+    else renderFiltered(books.filter(b=>b.category===cat));
 }
 
+// админ
+document.getElementById("adminBtn").onclick = ()=>{
+    const pass = prompt("Password");
+    if(pass==="iloverazemake"){
+        document.getElementById("adminPanel").style.display="flex";
+        renderAdmin();
+    }
 }
-
-function renderFiltered(list){
-
-books=list
-render()
-
-}
-
-/* admin */
-
-adminBtn.onclick=()=>{
-
-const p=prompt("Password")
-
-if(p==="iloverazemake"){
-
-adminPanel.style.display="flex"
-renderAdmin()
-
-}
-
-}
-
-function closeAdmin(){
-
-adminPanel.style.display="none"
-
-}
+function closeAdmin(){ document.getElementById("adminPanel").style.display="none"; }
 
 function addBook(){
-
-const book={
-
-title:title.value,
-pages:pages.value,
-category:category.value,
-image:image.value,
-
-links:{
-ru:ru.value,
-en:en.value,
-ua:ua.value
-}
-
-}
-
-books.push(book)
-
-save()
-render()
-renderAdmin()
-
+    const book = {
+        title:title.value, pages:pages.value, category:category.value, image:image.value,
+        links:{ru:ru.value,en:en.value,ua:ua.value}
+    };
+    // проверка на существующую книгу
+    const index = books.findIndex(b=>b.title === book.title);
+    if(index >= 0){ books[index] = book; } else { books.push(book); }
+    saveBooks();
+    renderBooks();
+    renderAdmin();
 }
 
 function renderAdmin(){
-
-adminList.innerHTML=""
-
-books.forEach((b,i)=>{
-
-const row=document.createElement("div")
-
-row.innerHTML=`
-
-${b.title}
-
-<button onclick="deleteBook(${i})" class="glass">
-Delete
-</button>
-
-`
-
-adminList.appendChild(row)
-
-})
-
+    const list = document.getElementById("adminList");
+    list.innerHTML="";
+    books.forEach((b,i)=>{
+        const row = document.createElement("div");
+        row.innerHTML = `${b.title} <button onclick="deleteBook(${i})" class="glassBtn">Delete</button>`;
+        list.appendChild(row);
+    });
 }
 
 function deleteBook(i){
-
-books.splice(i,1)
-
-save()
-render()
-renderAdmin()
-
+    books.splice(i,1);
+    saveBooks();
+    renderBooks();
+    renderAdmin();
 }
