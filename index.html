@@ -3,6 +3,8 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>RazeMake</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap" rel="stylesheet">
@@ -12,8 +14,9 @@
 body{
 margin:0;
 font-family:"Comfortaa",sans-serif;
-background:linear-gradient(#f4f4f4,#e8e8e8);
+background:linear-gradient(#f5f5f5,#e6e6e6);
 overflow-x:hidden;
+color:#222;
 }
 
 canvas{
@@ -35,7 +38,7 @@ to{opacity:1; transform:translateY(0); filter:blur(0)}
 }
 
 h1{
-font-size:36px;
+font-size:34px;
 }
 
 .lang{
@@ -43,17 +46,19 @@ position:absolute;
 right:20px;
 top:20px;
 display:flex;
-gap:10px;
+gap:12px;
 }
 
 .flag{
+width:34px;
 cursor:pointer;
-font-size:22px;
 transition:.3s;
+border-radius:6px;
+box-shadow:0 3px 10px rgba(0,0,0,0.15);
 }
 
 .flag:hover{
-transform:scale(1.3);
+transform:scale(1.2);
 }
 
 .controls{
@@ -71,6 +76,11 @@ background:#111;
 color:white;
 cursor:pointer;
 font-family:"Comfortaa";
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.05);
 }
 
 .library{
@@ -85,17 +95,29 @@ padding:40px;
 
 width:260px;
 
-background:rgba(255,255,255,0.55);
-backdrop-filter:blur(14px);
+background:linear-gradient(
+135deg,
+rgba(255,255,255,0.75),
+rgba(255,255,255,0.35)
+);
 
-border-radius:20px;
+backdrop-filter:blur(18px);
+
+border-radius:22px;
 
 padding:20px;
 
-box-shadow:0 20px 40px rgba(0,0,0,0.1);
+box-shadow:
+0 20px 50px rgba(0,0,0,0.12),
+inset 0 0 1px rgba(255,255,255,0.6);
 
-animation:fadeUp 0.8s;
+animation:fadeUp .8s;
+transition:.3s;
 
+}
+
+.card:hover{
+transform:translateY(-6px) scale(1.02);
 }
 
 .card img{
@@ -136,6 +158,40 @@ padding:30px;
 border-radius:20px;
 }
 
+/* MOBILE */
+
+@media (max-width:700px){
+
+header h1{
+font-size:24px;
+}
+
+.library{
+padding:20px;
+gap:20px;
+}
+
+.card{
+width:90%;
+max-width:340px;
+}
+
+.controls{
+flex-direction:column;
+align-items:center;
+}
+
+.lang{
+right:10px;
+top:10px;
+}
+
+.flag{
+width:28px;
+}
+
+}
+
 </style>
 
 </head>
@@ -146,9 +202,9 @@ border-radius:20px;
 
 <div class="lang">
 
-<div class="flag" onclick="setLang('ru')">🇷🇺</div>
-<div class="flag" onclick="setLang('en')">🇬🇧</div>
-<div class="flag" onclick="setLang('ua')">🇺🇦</div>
+<img src="https://flagcdn.com/w40/ru.png" class="flag" onclick="setLang('ru')">
+<img src="https://flagcdn.com/w40/gb.png" class="flag" onclick="setLang('en')">
+<img src="https://flagcdn.com/w40/ua.png" class="flag" onclick="setLang('ua')">
 
 </div>
 
@@ -188,12 +244,17 @@ let edit=false
 let books=JSON.parse(localStorage.getItem("books")||"[]")
 
 function save(){
-
 localStorage.setItem("books",JSON.stringify(books))
-
 }
 
 function toggleEdit(){
+
+const pass = prompt("Введите пароль администратора")
+
+if(pass !== "razemake2026"){
+alert("Неверный пароль")
+return
+}
 
 edit=!edit
 render()
@@ -209,7 +270,7 @@ pages:"0",
 languages:"RU",
 illustrations:"Нет",
 image:"",
-files:[""]
+files:["","",""]
 
 })
 
@@ -223,26 +284,21 @@ function openReader(files){
 let html=""
 
 files.forEach(f=>{
-
 if(f) html+=`<p><a href="${f}" target="_blank">Открыть файл</a></p>`
-
 })
 
 document.getElementById("files").innerHTML=html
-document.getElementById("reader").style.display="flex"
+reader.style.display="flex"
 
 }
 
 function closeReader(){
-
 reader.style.display="none"
-
 }
 
 function render(){
 
 let lib=document.getElementById("library")
-
 lib.innerHTML=""
 
 books.forEach((b,i)=>{
@@ -253,20 +309,15 @@ card.className="card"
 card.innerHTML=edit?`
 
 <input value="${b.title}" onchange="books[${i}].title=this.value;save()">
-
 <input value="${b.pages}" onchange="books[${i}].pages=this.value;save()">
-
 <input value="${b.languages}" onchange="books[${i}].languages=this.value;save()">
-
 <input value="${b.illustrations}" onchange="books[${i}].illustrations=this.value;save()">
 
 <input placeholder="URL картинки" value="${b.image}" onchange="books[${i}].image=this.value;save()">
 
-<input placeholder="Файл 1" value="${b.files[0]||''}" onchange="books[${i}].files[0]=this.value;save()">
-
-<input placeholder="Файл 2" value="${b.files[1]||''}" onchange="books[${i}].files[1]=this.value;save()">
-
-<input placeholder="Файл 3" value="${b.files[2]||''}" onchange="books[${i}].files[2]=this.value;save()">
+<input placeholder="Файл 1" value="${b.files[0]}" onchange="books[${i}].files[0]=this.value;save()">
+<input placeholder="Файл 2" value="${b.files[1]}" onchange="books[${i}].files[1]=this.value;save()">
+<input placeholder="Файл 3" value="${b.files[2]}" onchange="books[${i}].files[2]=this.value;save()">
 
 `:
 
@@ -294,7 +345,7 @@ lib.appendChild(card)
 
 render()
 
-// particles
+/* PARTICLES */
 
 const canvas=document.getElementById("bg")
 const ctx=canvas.getContext("2d")
@@ -304,13 +355,13 @@ canvas.height=innerHeight
 
 let shapes=[]
 
-for(let i=0;i<50;i++){
+for(let i=0;i<60;i++){
 
 shapes.push({
 
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:5+Math.random()*10,
+size:12+Math.random()*20,
 vx:-1+Math.random()*2,
 vy:-1+Math.random()*2,
 type:Math.floor(Math.random()*3)
@@ -322,10 +373,8 @@ type:Math.floor(Math.random()*3)
 let mouse={x:0,y:0}
 
 document.addEventListener("mousemove",e=>{
-
 mouse.x=e.clientX
 mouse.y=e.clientY
-
 })
 
 function draw(){
@@ -338,17 +387,22 @@ let dx=s.x-mouse.x
 let dy=s.y-mouse.y
 let dist=Math.sqrt(dx*dx+dy*dy)
 
-if(dist<120){
-
+if(dist<200){
 s.vx+=dx/dist
 s.vy+=dy/dist
-
 }
 
-s.x+=s.vx*0.03
-s.y+=s.vy*0.03
+s.x+=s.vx*0.05
+s.y+=s.vy*0.05
 
-ctx.fillStyle="rgba(0,0,0,0.08)"
+const colors=[
+"rgba(0,0,0,0.08)",
+"rgba(120,120,120,0.08)",
+"rgba(80,80,80,0.08)",
+"rgba(160,160,160,0.06)"
+]
+
+ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)]
 
 ctx.beginPath()
 
@@ -357,11 +411,9 @@ if(s.type==0) ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
 if(s.type==1) ctx.rect(s.x,s.y,s.size,s.size)
 
 if(s.type==2){
-
 ctx.moveTo(s.x,s.y)
 ctx.lineTo(s.x+s.size,s.y)
 ctx.lineTo(s.x+s.size/2,s.y+s.size)
-
 }
 
 ctx.fill()
@@ -374,7 +426,7 @@ requestAnimationFrame(draw)
 
 draw()
 
-// languages
+/* LANGUAGES */
 
 const texts={
 
@@ -385,9 +437,7 @@ ua:"Ласкаво просимо до онлайн-бібліотеки вид�
 }
 
 function setLang(l){
-
 document.getElementById("welcome").innerText=texts[l]
-
 }
 
 </script>
