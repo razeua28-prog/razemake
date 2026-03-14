@@ -3,7 +3,7 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>RazeMake</title>
 
@@ -14,9 +14,9 @@
 body{
 margin:0;
 font-family:"Comfortaa",sans-serif;
-background:linear-gradient(#f5f5f5,#e6e6e6);
-overflow-x:hidden;
+background:linear-gradient(#f6f6f6,#e7e7e7);
 color:#222;
+overflow-x:hidden;
 }
 
 canvas{
@@ -38,7 +38,7 @@ to{opacity:1; transform:translateY(0); filter:blur(0)}
 }
 
 h1{
-font-size:34px;
+font-size:32px;
 }
 
 .lang{
@@ -46,14 +46,14 @@ position:absolute;
 right:20px;
 top:20px;
 display:flex;
-gap:12px;
+gap:10px;
 }
 
 .flag{
 width:34px;
 cursor:pointer;
-transition:.3s;
 border-radius:6px;
+transition:.25s;
 box-shadow:0 3px 10px rgba(0,0,0,0.15);
 }
 
@@ -64,7 +64,7 @@ transform:scale(1.2);
 .controls{
 display:flex;
 justify-content:center;
-gap:20px;
+gap:15px;
 margin-bottom:30px;
 }
 
@@ -76,17 +76,12 @@ background:#111;
 color:white;
 cursor:pointer;
 font-family:"Comfortaa";
-transition:.2s;
-}
-
-button:hover{
-transform:scale(1.05);
 }
 
 .library{
 display:flex;
 flex-wrap:wrap;
-gap:30px;
+gap:28px;
 justify-content:center;
 padding:40px;
 }
@@ -105,25 +100,24 @@ backdrop-filter:blur(18px);
 
 border-radius:22px;
 
-padding:20px;
+padding:18px;
 
 box-shadow:
 0 20px 50px rgba(0,0,0,0.12),
 inset 0 0 1px rgba(255,255,255,0.6);
 
-animation:fadeUp .8s;
 transition:.3s;
 
 }
 
 .card:hover{
-transform:translateY(-6px) scale(1.02);
+transform:translateY(-6px);
 }
 
 .card img{
 width:100%;
 border-radius:10px;
-margin-bottom:10px;
+margin-bottom:8px;
 }
 
 input{
@@ -162,9 +156,7 @@ border-radius:20px;
 
 @media (max-width:700px){
 
-header h1{
-font-size:24px;
-}
+h1{font-size:22px}
 
 .library{
 padding:20px;
@@ -182,18 +174,17 @@ align-items:center;
 }
 
 .lang{
-right:10px;
 top:10px;
+right:10px;
 }
 
 .flag{
-width:28px;
+width:26px;
 }
 
 }
 
 </style>
-
 </head>
 
 <body>
@@ -218,8 +209,11 @@ width:28px;
 
 <div class="controls">
 
-<button onclick="toggleEdit()">Редактировать</button>
-<button onclick="addBook()">Добавить книгу</button>
+<button onclick="adminLogin()">Войти как администратор</button>
+
+<button id="addBtn" onclick="addBook()" style="display:none">
+Добавить книгу
+</button>
 
 </div>
 
@@ -239,7 +233,9 @@ width:28px;
 
 <script>
 
-let edit=false
+const ADMIN_PASSWORD="razemake2026"
+
+let isAdmin=sessionStorage.getItem("razeAdmin")==="true"
 
 let books=JSON.parse(localStorage.getItem("books")||"[]")
 
@@ -247,21 +243,34 @@ function save(){
 localStorage.setItem("books",JSON.stringify(books))
 }
 
-function toggleEdit(){
+function adminLogin(){
 
-const pass = prompt("Введите пароль администратора")
+const p=prompt("Пароль администратора")
 
-if(pass !== "razemake2026"){
-alert("Неверный пароль")
-return
-}
+if(p===ADMIN_PASSWORD){
 
-edit=!edit
+isAdmin=true
+sessionStorage.setItem("razeAdmin","true")
+
+document.getElementById("addBtn").style.display="inline-block"
+
 render()
 
+}else{
+
+alert("Неверный пароль")
+
+}
+
+}
+
+if(isAdmin){
+document.getElementById("addBtn").style.display="inline-block"
 }
 
 function addBook(){
+
+if(!isAdmin) return
 
 books.push({
 
@@ -299,6 +308,7 @@ reader.style.display="none"
 function render(){
 
 let lib=document.getElementById("library")
+
 lib.innerHTML=""
 
 books.forEach((b,i)=>{
@@ -306,29 +316,40 @@ books.forEach((b,i)=>{
 let card=document.createElement("div")
 card.className="card"
 
-card.innerHTML=edit?`
+if(isAdmin){
+
+card.innerHTML=`
 
 <input value="${b.title}" onchange="books[${i}].title=this.value;save()">
+
 <input value="${b.pages}" onchange="books[${i}].pages=this.value;save()">
+
 <input value="${b.languages}" onchange="books[${i}].languages=this.value;save()">
+
 <input value="${b.illustrations}" onchange="books[${i}].illustrations=this.value;save()">
 
 <input placeholder="URL картинки" value="${b.image}" onchange="books[${i}].image=this.value;save()">
 
 <input placeholder="Файл 1" value="${b.files[0]}" onchange="books[${i}].files[0]=this.value;save()">
+
 <input placeholder="Файл 2" value="${b.files[1]}" onchange="books[${i}].files[1]=this.value;save()">
+
 <input placeholder="Файл 3" value="${b.files[2]}" onchange="books[${i}].files[2]=this.value;save()">
 
-`:
-
 `
+
+}else{
+
+card.innerHTML=`
 
 <img src="${b.image||'https://picsum.photos/300/400'}">
 
 <h3>${b.title}</h3>
 
 <p>Кол-во страниц: ${b.pages}</p>
+
 <p>Доступные языки: ${b.languages}</p>
+
 <p>Иллюстрации: ${b.illustrations}</p>
 
 <button class="readBtn" onclick='openReader(${JSON.stringify(b.files)})'>
@@ -336,6 +357,8 @@ card.innerHTML=edit?`
 </button>
 
 `
+
+}
 
 lib.appendChild(card)
 
@@ -350,20 +373,25 @@ render()
 const canvas=document.getElementById("bg")
 const ctx=canvas.getContext("2d")
 
-canvas.width=innerWidth
-canvas.height=innerHeight
+function resize(){
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+}
+
+resize()
+window.addEventListener("resize",resize)
 
 let shapes=[]
 
-for(let i=0;i<60;i++){
+for(let i=0;i<50;i++){
 
 shapes.push({
 
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:12+Math.random()*20,
-vx:-1+Math.random()*2,
-vy:-1+Math.random()*2,
+size:14+Math.random()*18,
+vx:(Math.random()-0.5)*1.5,
+vy:(Math.random()-0.5)*1.5,
 type:Math.floor(Math.random()*3)
 
 })
@@ -387,33 +415,48 @@ let dx=s.x-mouse.x
 let dy=s.y-mouse.y
 let dist=Math.sqrt(dx*dx+dy*dy)
 
-if(dist<200){
-s.vx+=dx/dist
-s.vy+=dy/dist
+if(dist<180){
+
+s.vx+=dx*0.002
+s.vy+=dy*0.002
+
 }
 
-s.x+=s.vx*0.05
-s.y+=s.vy*0.05
+s.x+=s.vx
+s.y+=s.vy
+
+if(s.x<0||s.x>canvas.width) s.vx*=-1
+if(s.y<0||s.y>canvas.height) s.vy*=-1
 
 const colors=[
-"rgba(0,0,0,0.08)",
-"rgba(120,120,120,0.08)",
-"rgba(80,80,80,0.08)",
-"rgba(160,160,160,0.06)"
+"rgba(0,0,0,0.07)",
+"rgba(100,100,100,0.06)",
+"rgba(150,150,150,0.05)"
 ]
 
-ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)]
+ctx.fillStyle=colors[s.type]
 
 ctx.beginPath()
 
-if(s.type==0) ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
+if(s.type===0){
 
-if(s.type==1) ctx.rect(s.x,s.y,s.size,s.size)
+ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
 
-if(s.type==2){
+}
+
+if(s.type===1){
+
+ctx.rect(s.x,s.y,s.size,s.size)
+
+}
+
+if(s.type===2){
+
 ctx.moveTo(s.x,s.y)
 ctx.lineTo(s.x+s.size,s.y)
 ctx.lineTo(s.x+s.size/2,s.y+s.size)
+ctx.closePath()
+
 }
 
 ctx.fill()
@@ -426,7 +469,7 @@ requestAnimationFrame(draw)
 
 draw()
 
-/* LANGUAGES */
+/* LANG */
 
 const texts={
 
