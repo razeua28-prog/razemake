@@ -1,7 +1,8 @@
-let books=[]
 let lang="ru"
+let books=[]
+let admin=false
 
-const t={
+const text={
 
 ru:{
 welcome:"Добро пожаловать в онлайн-библиотеку издательства RazeMake!",
@@ -18,7 +19,7 @@ pages:"Pages",
 languages:"Languages",
 illustrations:"Illustrations",
 read:"Read",
-admin:"Login as admin"
+admin:"Admin login"
 },
 
 ua:{
@@ -32,38 +33,46 @@ admin:"Увійти як адміністратор"
 
 }
 
+fetch("books.json")
+.then(r=>r.json())
+.then(d=>{
+books=d
+render()
+})
+
 function render(){
 
-document.getElementById("welcome").innerText=t[lang].welcome
-document.getElementById("adminBtn").innerText=t[lang].admin
+document.getElementById("welcome").innerText=text[lang].welcome
+document.getElementById("adminBtn").innerText=text[lang].admin
 
 const container=document.getElementById("books")
+
 container.innerHTML=""
 
-books.forEach(b=>{
+books.forEach(book=>{
 
-const el=document.createElement("div")
-el.className="book"
+const div=document.createElement("div")
+div.className="book"
 
-el.innerHTML=`
+div.innerHTML=`
 
-<img src="${b.image}">
+<img src="${book.image}">
 
-<h3>${b.title[lang]}</h3>
+<h3>${book.title[lang]}</h3>
 
-<p>${t[lang].pages}: ${b.pages}</p>
+<p>${text[lang].pages}: ${book.pages}</p>
 
-<p>${t[lang].languages}: ${b.languages.join(", ")}</p>
+<p>${text[lang].languages}: ${book.languages.join(",")}</p>
 
-<p>${t[lang].illustrations}: ${b.illustrations?"✔":"✖"}</p>
+<p>${text[lang].illustrations}: ${book.illustrations?"✔":"✖"}</p>
 
-<button class="readBtn">${t[lang].read}</button>
+<button class="readBtn">${text[lang].read}</button>
 
 `
 
-el.querySelector("button").onclick=()=>openBook(b)
+div.querySelector("button").onclick=()=>openBook(book)
 
-container.appendChild(el)
+container.appendChild(div)
 
 })
 
@@ -71,57 +80,59 @@ container.appendChild(el)
 
 function openBook(book){
 
-document.getElementById("readerModal").style.display="flex"
+document.getElementById("modal").style.display="flex"
 
 const list=document.getElementById("fileList")
 
 list.innerHTML=""
 
-Object.entries(book.files).forEach(([k,v])=>{
+for(let l in book.files){
 
 const a=document.createElement("a")
 
-a.href=v
+a.href=book.files[l]
 
-a.innerText=k
+a.innerText=l
 
 a.target="_blank"
 
+a.style.display="block"
+
+a.style.margin="10px 0"
+
 list.appendChild(a)
 
-})
+}
 
 }
 
 function closeModal(){
-document.getElementById("readerModal").style.display="none"
+
+document.getElementById("modal").style.display="none"
+
 }
 
-fetch("books.json")
-.then(r=>r.json())
-.then(d=>{
+document.querySelectorAll(".lang img").forEach(el=>{
 
-books=d
+el.onclick=()=>{
+
+lang=el.dataset.lang
+
 render()
 
-})
-
-document.querySelectorAll(".flag").forEach(f=>{
-
-f.onclick=()=>{
-lang=f.dataset.lang
-render()
 }
 
 })
 
 document.getElementById("adminBtn").onclick=()=>{
 
-const pass=prompt("Password")
+const p=prompt("Password")
 
-if(pass==="iloverazemake"){
+if(p==="iloverazemake"){
 
-alert("Admin mode")
+admin=true
+
+alert("Admin mode enabled")
 
 }
 
@@ -132,17 +143,25 @@ const ctx=canvas.getContext("2d")
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
 
+let mouse={x:0,y:0}
+
+document.addEventListener("mousemove",e=>{
+mouse.x=e.clientX
+mouse.y=e.clientY
+})
+
 let shapes=[]
 
-for(let i=0;i<40;i++){
+for(let i=0;i<60;i++){
 
 shapes.push({
 
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:10+Math.random()*10,
-dx:(Math.random()-0.5),
-dy:(Math.random()-0.5)
+size:6+Math.random()*10,
+type:Math.floor(Math.random()*3),
+dx:(Math.random()-.5)*1,
+dy:(Math.random()-.5)*1
 
 })
 
@@ -154,11 +173,43 @@ ctx.clearRect(0,0,canvas.width,canvas.height)
 
 shapes.forEach(s=>{
 
+let dist=Math.hypot(mouse.x-s.x,mouse.y-s.y)
+
+if(dist<120){
+
+s.x+=(s.x-mouse.x)*0.02
+s.y+=(s.y-mouse.y)*0.02
+s.size+=0.2
+
+}else{
+
+s.size*=0.98
+
+}
+
+ctx.fillStyle="rgba(255,255,255,0.07)"
+
 ctx.beginPath()
+
+if(s.type===0){
 
 ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
 
-ctx.fillStyle="rgba(255,255,255,0.05)"
+}
+
+if(s.type===1){
+
+ctx.rect(s.x,s.y,s.size,s.size)
+
+}
+
+if(s.type===2){
+
+ctx.moveTo(s.x,s.y)
+ctx.lineTo(s.x+s.size,s.y)
+ctx.lineTo(s.x+s.size/2,s.y-s.size)
+
+}
 
 ctx.fill()
 
