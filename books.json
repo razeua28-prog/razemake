@@ -1,24 +1,13 @@
 [
 {
-"title":{
-"ru":"Пример книги",
-"en":"Example Book",
-"ua":"Приклад книги"
-},
-
+"title":"Example Poetry",
 "pages":120,
-
-"languages":["RU","EN","UA"],
-
-"illustrations":true,
-
-"image":"images/cover.jpg",
-
-"files":{
-"RU":"books/example.pdf",
-"EN":"books/example.pdf",
-"UA":"books/example.pdf"
+"category":"poetry",
+"image":"https://picsum.photos/400/600",
+"links":{
+"ru":"books/book_ru.pdf",
+"en":"books/book_en.pdf",
+"ua":"books/book_ua.pdf"
 }
-
 }
 ]
