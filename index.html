@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>RazeMake Library</title>
+<title>RazeMake</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -16,15 +16,17 @@
 
 <body>
 
+<div class="topGlow"></div>
+
 <canvas id="bg"></canvas>
 
-<button id="adminBtn"></button>
+<button id="adminBtn">Admin</button>
 
 <div class="flags">
 
-<img src="https://flagcdn.com/w40/ru.png" data-lang="ru">
-<img src="https://flagcdn.com/w40/gb.png" data-lang="en">
-<img src="https://flagcdn.com/w40/ua.png" data-lang="ua">
+<img src="https://flagcdn.com/w80/gb.png" data-lang="en">
+<img src="https://flagcdn.com/w80/ru.png" data-lang="ru">
+<img src="https://flagcdn.com/w80/ua.png" data-lang="ua">
 
 </div>
 
@@ -44,7 +46,35 @@
 
 <div id="fileList"></div>
 
-<button id="closeModal">✕</button>
+<button onclick="closeReader()">Close</button>
+
+</div>
+
+</div>
+
+<div id="adminPanel" class="modal">
+
+<div class="modalBox">
+
+<h2>Admin panel</h2>
+
+<input id="bookTitle" placeholder="Title">
+
+<input id="bookPages" placeholder="Pages">
+
+<input id="bookImage" placeholder="Cover image URL">
+
+<input id="ruLink" placeholder="RU link">
+
+<input id="enLink" placeholder="EN link">
+
+<input id="uaLink" placeholder="UA link">
+
+<button onclick="addBook()">Add book</button>
+
+<div id="adminBooks"></div>
+
+<button onclick="closeAdmin()">Close</button>
 
 </div>
 
