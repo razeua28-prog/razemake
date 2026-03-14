@@ -1,61 +1,66 @@
-const scene = new THREE.Scene()
+const scene=new THREE.Scene()
 
-const camera = new THREE.PerspectiveCamera(
+const camera=new THREE.PerspectiveCamera(
 60,
 window.innerWidth/window.innerHeight,
 0.1,
 1000
 )
 
-const renderer = new THREE.WebGLRenderer({alpha:true})
+const renderer=new THREE.WebGLRenderer({alpha:true})
+
 renderer.setSize(window.innerWidth,window.innerHeight)
 
-document.body.appendChild(renderer.domElement)
+document.getElementById("bg3d").appendChild(renderer.domElement)
 
 camera.position.z=8
 
 const shapes=[]
 
-function createCube(){
+function cube(){
 
 const geo=new THREE.BoxGeometry()
+
 const mat=new THREE.MeshBasicMaterial({
 color:0xffffff,
 wireframe:true
 })
 
-const cube=new THREE.Mesh(geo,mat)
+const mesh=new THREE.Mesh(geo,mat)
 
-cube.position.x=(Math.random()-0.5)*12
-cube.position.y=(Math.random()-0.5)*8
+mesh.position.x=(Math.random()-0.5)*10
+mesh.position.y=(Math.random()-0.5)*6
 
-scene.add(cube)
-shapes.push(cube)
+scene.add(mesh)
+
+shapes.push(mesh)
 
 }
 
-function createPyramid(){
+function pyramid(){
 
 const geo=new THREE.ConeGeometry(1,1.5,4)
+
 const mat=new THREE.MeshBasicMaterial({
 color:0xffffff,
 wireframe:true
 })
 
-const pyramid=new THREE.Mesh(geo,mat)
+const mesh=new THREE.Mesh(geo,mat)
 
-pyramid.position.x=(Math.random()-0.5)*12
-pyramid.position.y=(Math.random()-0.5)*8
+mesh.position.x=(Math.random()-0.5)*10
+mesh.position.y=(Math.random()-0.5)*6
 
-scene.add(pyramid)
-shapes.push(pyramid)
+scene.add(mesh)
+
+shapes.push(mesh)
 
 }
 
-for(let i=0;i<20;i++){
+for(let i=0;i<15;i++){
 
-createCube()
-createPyramid()
+cube()
+pyramid()
 
 }
 
@@ -74,8 +79,8 @@ requestAnimationFrame(animate)
 
 shapes.forEach(s=>{
 
-s.rotation.x+=0.003
-s.rotation.y+=0.004
+s.rotation.x+=0.004
+s.rotation.y+=0.005
 
 s.position.x+=mouse.x*0.02
 s.position.y+=mouse.y*0.02
